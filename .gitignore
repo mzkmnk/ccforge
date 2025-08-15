@@ -1,0 +1,121 @@
+# Goビルド成果物
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+ccforge
+
+# Go一時ファイル
+*.prof
+*.test
+*.cover
+*.coverprofile
+coverage.txt
+coverage.html
+
+# 依存関係管理
+go.sum
+vendor/
+
+# バイナリ出力
+/bin/
+/dist/
+/build/
+/release/
+
+# IDEとエディタ
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# OS固有ファイル
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.pid
+*.log
+
+# ccforge固有
+# セッションデータ
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# ローカル設定（プロジェクトルート直下のみ）
+/ccforge/config.toml
+/ccforge/.env
+/ccforge/sessions/
+/ccforge/cache/
+/ccforge/tmp/
+
+# ユーザー設定は除外しない（タスクspecsは共有する）
+!/ccforge/*/requirements.md
+!/ccforge/*/design.md
+!/ccforge/*/tasks.md
+
+# デバッグファイル
+debug
+debug.test
+*.pprof
+*.mem
+*.cpu
+*.trace
+__debug_bin*
+
+# テスト結果
+/test-results/
+/test-reports/
+*.test.json
+/benchmarks/
+
+# ドキュメント生成
+/docs/_build/
+/docs/generated/
+
+# 環境変数
+.env
+.env.local
+.env.*.local
+
+# TLS証明書（開発用）
+*.pem
+*.key
+*.crt
+*.cer
+
+# バックアップファイル
+*.backup
+*.bak
+*.tmp
+
+# ログファイル
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# その他
+.history/
+.cache/
+node_modules/
