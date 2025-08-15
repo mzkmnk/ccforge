@@ -1,4 +1,4 @@
-name: リリース
+name: Release
 
 on:
   push:
@@ -10,27 +10,27 @@ permissions:
 
 jobs:
   release:
-    name: リリース
+    name: Release
     runs-on: ubuntu-latest
     
     steps:
-    - name: チェックアウト
+    - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
     
-    - name: Go のセットアップ
+    - name: Setup Go
       uses: actions/setup-go@v5
       with:
         go-version: '1.23'
     
-    - name: 依存関係のダウンロード
+    - name: Download Dependencies
       run: go mod download
     
-    - name: テスト実行
+    - name: Run Tests
       run: go test -v ./...
     
-    - name: GoReleaser のセットアップと実行
+    - name: Setup and Run GoReleaser
       uses: goreleaser/goreleaser-action@v6
       with:
         distribution: goreleaser
@@ -40,7 +40,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-artifacts:
-    name: ビルド成果物の作成
+    name: Build Artifacts
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -57,22 +57,22 @@ jobs:
             build_name: ccforge.exe
     
     steps:
-    - name: チェックアウト
+    - name: Checkout
       uses: actions/checkout@v4
     
-    - name: Go のセットアップ
+    - name: Setup Go
       uses: actions/setup-go@v5
       with:
         go-version: '1.23'
     
-    - name: 依存関係のダウンロード
+    - name: Download Dependencies
       run: go mod download
     
-    - name: ビルド
+    - name: Build
       run: |
         go build -v -o ${{ matrix.build_name }} .
     
-    - name: アーティファクトのアップロード
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.artifact_name }}

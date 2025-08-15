@@ -8,19 +8,19 @@ on:
 
 jobs:
   test:
-    name: テストとビルド
+    name: Test and Build
     runs-on: ubuntu-latest
     
     steps:
-    - name: チェックアウト
+    - name: Checkout
       uses: actions/checkout@v4
     
-    - name: Go のセットアップ
+    - name: Setup Go
       uses: actions/setup-go@v5
       with:
         go-version: '1.23'
     
-    - name: キャッシュの設定
+    - name: Setup Cache
       uses: actions/cache@v4
       with:
         path: |
@@ -30,35 +30,35 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-1.23-
     
-    - name: 依存関係のダウンロード
+    - name: Download Dependencies
       run: go mod download
     
-    - name: フォーマットチェック
+    - name: Format Check
       run: |
         go fmt ./...
         git diff --exit-code
     
-    - name: Vet チェック
+    - name: Vet Check
       run: go vet ./...
     
-    - name: テスト実行
+    - name: Run Tests
       run: go test -v -race -coverprofile=coverage.out ./...
     
-    - name: カバレッジレポート
+    - name: Coverage Report
       run: go tool cover -func=coverage.out
     
-    - name: ビルド
+    - name: Build
       run: go build -v ./...
 
   lint:
-    name: リント
+    name: Lint
     runs-on: ubuntu-latest
     
     steps:
-    - name: チェックアウト
+    - name: Checkout
       uses: actions/checkout@v4
     
-    - name: Go のセットアップ
+    - name: Setup Go
       uses: actions/setup-go@v5
       with:
         go-version: '1.23'
@@ -70,24 +70,24 @@ jobs:
         args: --timeout=5m
 
   security:
-    name: セキュリティチェック
+    name: Security Check
     runs-on: ubuntu-latest
     
     steps:
-    - name: チェックアウト
+    - name: Checkout
       uses: actions/checkout@v4
     
-    - name: Go のセットアップ
+    - name: Setup Go
       uses: actions/setup-go@v5
       with:
         go-version: '1.23'
     
-    - name: Gosec セキュリティスキャン
+    - name: Gosec Security Scan
       uses: securego/gosec@master
       with:
         args: ./...
     
-    - name: 脆弱性チェック
+    - name: Vulnerability Check
       run: |
         go install golang.org/x/vuln/cmd/govulncheck@latest
         govulncheck ./...
