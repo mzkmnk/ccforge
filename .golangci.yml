@@ -1,42 +1,31 @@
 linters:
   enable:
     - bodyclose
-    - deadcode
-    - depguard
     - dogsled
     - dupl
     - errcheck
     - exhaustive
     - funlen
-    - gochecknoinits
     - goconst
     - gocritic
     - gocyclo
     - gofmt
     - goimports
-    - golint
-    - gomnd
-    - goprintffuncname
     - gosec
     - gosimple
     - govet
     - ineffassign
-    - interfacer
     - lll
     - misspell
     - nakedret
     - noctx
     - nolintlint
-    - rowserrcheck
-    - scopelint
     - staticcheck
-    - structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
     - prealloc
 
@@ -46,8 +35,6 @@ linters-settings:
   funlen:
     lines: 100
     statements: 50
-  gci:
-    local-prefixes: github.com/mzkmnk/ccforge
   goconst:
     min-len: 2
     min-occurrences: 2
@@ -62,20 +49,13 @@ linters-settings:
     min-complexity: 15
   goimports:
     local-prefixes: github.com/mzkmnk/ccforge
-  golint:
-    min-confidence: 0
-  gomnd:
-    settings:
-      mnd:
-        checks: argument,case,condition,operation,return,assign
   govet:
-    check-shadowing: true
+    enable-all: true
   lll:
     line-length: 140
   misspell:
     locale: US
   nolintlint:
-    allow-leading-space: true
     allow-unused: false
     require-explanation: false
     require-specific: false
@@ -84,12 +64,11 @@ issues:
   exclude-rules:
     - path: _test\.go
       linters:
-        - gomnd
         - funlen
         - dupl
 
 run:
-  skip-dirs:
+  exclude-dirs:
     - vendor
     - third_party
     - testdata
