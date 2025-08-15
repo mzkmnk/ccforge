@@ -44,14 +44,14 @@ func TestParseCLIArgs(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// フラグをリセット
 			flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
-			
+
 			help, err := parseCLIArgs(tt.args)
-			
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseCLIArgs() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			
+
 			if help != tt.wantHelp {
 				t.Errorf("parseCLIArgs() help = %v, want %v", help, tt.wantHelp)
 			}
@@ -102,12 +102,12 @@ func TestInitializeApp(t *testing.T) {
 			}()
 
 			app, err := initializeApp()
-			
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("initializeApp() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			
+
 			if !tt.wantErr && app == nil {
 				t.Error("initializeApp() returned nil app without error")
 			}
@@ -141,7 +141,7 @@ func TestRunApp(t *testing.T) {
 		{
 			name: "異常系_実行時エラー",
 			app: &Application{
-				testMode:  true,
+				testMode:   true,
 				forceError: true,
 			},
 			wantPanic: false,
@@ -159,7 +159,7 @@ func TestRunApp(t *testing.T) {
 			}()
 
 			err := runApp(tt.app)
-			
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("runApp() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -213,7 +213,7 @@ func TestMainFlow(t *testing.T) {
 
 			// mainFlowは実装時にmain関数のロジックを分離した関数
 			err := mainFlow(tt.args)
-			
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("mainFlow() error = %v, wantErr %v", err, tt.wantErr)
 			}

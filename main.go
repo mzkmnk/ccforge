@@ -21,13 +21,13 @@ func parseCLIArgs(args []string) (help bool, err error) {
 	fs := flag.NewFlagSet("ccforge", flag.ContinueOnError)
 	fs.BoolVar(&help, "h", false, "ヘルプを表示")
 	fs.BoolVar(&help, "help", false, "ヘルプを表示")
-	
+
 	// 引数をパース
 	err = fs.Parse(args)
 	if err != nil {
 		return false, err
 	}
-	
+
 	return help, nil
 }
 
@@ -37,24 +37,24 @@ func initializeApp() (*Application, error) {
 	if os.Getenv("CCFORGE_INIT_ERROR") == "true" {
 		return nil, fmt.Errorf("初期化エラー（テスト用）")
 	}
-	
+
 	// テストモードの確認
 	testMode := os.Getenv("CCFORGE_TEST_MODE") == "true"
-	
+
 	app := &Application{
 		testMode: testMode,
 	}
-	
+
 	// テストモードでない場合はBubble Teaプログラムを初期化
 	if !testMode {
 		// TUIモデルの作成
 		model := tui.NewModel()
-		
+
 		// Bubble Teaプログラムの作成
 		p := tea.NewProgram(model, tea.WithAltScreen())
 		app.program = p
 	}
-	
+
 	return app, nil
 }
 
@@ -63,24 +63,24 @@ func runApp(app *Application) error {
 	if app == nil {
 		return fmt.Errorf("アプリケーションがnilです")
 	}
-	
+
 	// テスト用エラー処理
 	if app.forceError {
 		return fmt.Errorf("実行時エラー（テスト用）")
 	}
-	
+
 	// テストモードの場合は即座に終了
 	if app.testMode {
 		return nil
 	}
-	
+
 	// Bubble Teaプログラムの実行
 	if app.program != nil {
 		if _, err := app.program.Run(); err != nil {
 			return fmt.Errorf("プログラム実行エラー: %w", err)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -91,24 +91,24 @@ func mainFlow(args []string) error {
 	if err != nil {
 		return fmt.Errorf("引数パースエラー: %w", err)
 	}
-	
+
 	// ヘルプ表示
 	if help {
 		showHelp()
 		return nil
 	}
-	
+
 	// アプリケーションの初期化
 	app, err := initializeApp()
 	if err != nil {
 		return fmt.Errorf("初期化エラー: %w", err)
 	}
-	
+
 	// アプリケーションの実行
 	if err := runApp(app); err != nil {
 		return fmt.Errorf("実行エラー: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -140,7 +140,7 @@ ccforge - Claude Code TUIアプリケーション
 func main() {
 	// os.Argsから実行ファイル名を除いた引数を取得
 	args := os.Args[1:]
-	
+
 	// メインフローの実行
 	if err := mainFlow(args); err != nil {
 		fmt.Fprintf(os.Stderr, "エラー: %v\n", err)

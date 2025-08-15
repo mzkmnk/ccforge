@@ -18,7 +18,6 @@ coverage.txt
 coverage.html
 
 # 依存関係管理
-go.sum
 vendor/
 
 # バイナリ出力

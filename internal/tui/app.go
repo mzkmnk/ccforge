@@ -38,7 +38,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// 終了
 			return m, tea.Quit
 		}
-	
+
 	case tea.WindowSizeMsg:
 		// ウィンドウサイズ変更の処理
 		m.width = msg.Width
@@ -46,7 +46,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !m.ready {
 			m.ready = true
 		}
-	
+
 	case error:
 		// エラーメッセージの処理
 		m.err = msg
@@ -70,6 +70,6 @@ func (m Model) View() string {
 	view := m.output + "\n\n"
 	view += "キーバインド:\n"
 	view += "  q, Ctrl+C: 終了\n"
-	
+
 	return view
 }
