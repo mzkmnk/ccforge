@@ -24,11 +24,6 @@
   - [x] `internal/config/`
 
 ## 開発環境の整備
-- [x] Makefile の作成
-  - [x] ビルドタスク
-  - [x] テストタスク
-  - [x] リントタスク
-  - [x] インストールタスク
 - [x] GitHub Actions の設定
   - [x] CI/CD パイプライン
   - [x] テスト自動実行
