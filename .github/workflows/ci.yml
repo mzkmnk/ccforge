@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: テストとビルド
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.21', '1.22', '1.23']
+    
+    steps:
+    - name: チェックアウト
+      uses: actions/checkout@v4
+    
+    - name: Go のセットアップ
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ matrix.go-version }}
+    
+    - name: キャッシュの設定
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-${{ matrix.go-version }}-
+    
+    - name: 依存関係のダウンロード
+      run: go mod download
+    
+    - name: フォーマットチェック
+      run: |
+        go fmt ./...
+        git diff --exit-code
+    
+    - name: Vet チェック
+      run: go vet ./...
+    
+    - name: テスト実行
+      run: go test -v -race -coverprofile=coverage.out ./...
+    
+    - name: カバレッジレポート
+      run: go tool cover -func=coverage.out
+    
+    - name: ビルド
+      run: go build -v ./...
+
+  lint:
+    name: リント
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: チェックアウト
+      uses: actions/checkout@v4
+    
+    - name: Go のセットアップ
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+    
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: latest
+        args: --timeout=5m
+
+  security:
+    name: セキュリティチェック
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: チェックアウト
+      uses: actions/checkout@v4
+    
+    - name: Go のセットアップ
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+    
+    - name: Gosec セキュリティスキャン
+      uses: securego/gosec@master
+      with:
+        args: ./...
+    
+    - name: 脆弱性チェック
+      run: |
+        go install golang.org/x/vuln/cmd/govulncheck@latest
+        govulncheck ./...
