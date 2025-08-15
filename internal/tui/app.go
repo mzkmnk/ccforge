@@ -6,6 +6,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+const (
+	// InitializingMessage は初期化中に表示するメッセージ
+	InitializingMessage = "初期化中..."
+)
+
 // Model はTUIアプリケーションの状態を管理する構造体
 type Model struct {
 	width  int    // ターミナル幅
@@ -59,7 +64,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // View は現在の状態を文字列として描画する
 func (m Model) View() string {
 	if !m.ready {
-		return "初期化中..."
+		return InitializingMessage
 	}
 
 	if m.err != nil {

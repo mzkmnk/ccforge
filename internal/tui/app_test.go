@@ -11,12 +11,12 @@ import (
 // TestNewModel tests Model構造体の作成
 func TestNewModel(t *testing.T) {
 	tests := []struct {
-		name         string
-		wantOutput   string
-		wantWidth    int
-		wantHeight   int
-		wantReady    bool
-		wantErrNil   bool
+		name       string
+		wantOutput string
+		wantWidth  int
+		wantHeight int
+		wantReady  bool
+		wantErrNil bool
 	}{
 		{
 			name:       "正常系_初期化時の状態",
@@ -68,7 +68,7 @@ func TestModel_Init(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := tt.model.Init()
-			
+
 			if (cmd == nil) != tt.wantNil {
 				t.Errorf("Model.Init() = %v, want nil = %v", cmd, tt.wantNil)
 			}
@@ -76,17 +76,12 @@ func TestModel_Init(t *testing.T) {
 	}
 }
 
-// TestModel_Update tests Updateメソッド（各メッセージタイプ）
-func TestModel_Update(t *testing.T) {
+// TestModel_Update_KeyMessages tests キー入力メッセージの処理
+func TestModel_Update_KeyMessages(t *testing.T) {
 	tests := []struct {
 		name      string
 		model     Model
 		msg       tea.Msg
-		wantCmd   tea.Cmd
-		wantWidth int
-		wantHeight int
-		wantReady bool
-		wantErr   error
 		checkQuit bool
 	}{
 		{
@@ -101,6 +96,41 @@ func TestModel_Update(t *testing.T) {
 			msg:       tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'q'}},
 			checkQuit: true,
 		},
+		{
+			name:      "正常系_その他のキー入力",
+			model:     NewModel(),
+			msg:       tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'a'}},
+			checkQuit: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, cmd := tt.model.Update(tt.msg)
+
+			if tt.checkQuit {
+				if cmd == nil {
+					t.Error("Model.Update() expected quit command, got nil")
+				}
+			} else {
+				if cmd != nil {
+					t.Errorf("Model.Update() cmd = %v, want nil", cmd)
+				}
+			}
+		})
+	}
+}
+
+// TestModel_Update_WindowResize tests ウィンドウリサイズメッセージの処理
+func TestModel_Update_WindowResize(t *testing.T) {
+	tests := []struct {
+		name       string
+		model      Model
+		msg        tea.WindowSizeMsg
+		wantWidth  int
+		wantHeight int
+		wantReady  bool
+	}{
 		{
 			name:       "正常系_ウィンドウサイズ変更",
 			model:      NewModel(),
@@ -119,87 +149,86 @@ func TestModel_Update(t *testing.T) {
 			wantHeight: 24,
 			wantReady:  true,
 		},
-		{
-			name:    "正常系_エラーメッセージ処理",
-			model:   NewModel(),
-			msg:     errors.New("テストエラー"),
-			wantErr: errors.New("テストエラー"),
-		},
-		{
-			name:    "正常系_その他のキー入力",
-			model:   NewModel(),
-			msg:     tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'a'}},
-			wantCmd: nil,
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			updatedModel, cmd := tt.model.Update(tt.msg)
+			updatedModel, _ := tt.model.Update(tt.msg)
 			m := updatedModel.(Model)
 
-			// 終了コマンドのチェック
-			if tt.checkQuit {
-				if cmd == nil {
-					t.Error("Model.Update() expected quit command, got nil")
-				}
-				// tea.Quitは関数なので、nilでないことだけ確認
-				return
+			if m.width != tt.wantWidth {
+				t.Errorf("Model.Update() width = %v, want %v", m.width, tt.wantWidth)
 			}
-
-			// ウィンドウサイズのチェック
-			if _, ok := tt.msg.(tea.WindowSizeMsg); ok {
-				if m.width != tt.wantWidth {
-					t.Errorf("Model.Update() width = %v, want %v", m.width, tt.wantWidth)
-				}
-				if m.height != tt.wantHeight {
-					t.Errorf("Model.Update() height = %v, want %v", m.height, tt.wantHeight)
-				}
-				if m.ready != tt.wantReady {
-					t.Errorf("Model.Update() ready = %v, want %v", m.ready, tt.wantReady)
-				}
+			if m.height != tt.wantHeight {
+				t.Errorf("Model.Update() height = %v, want %v", m.height, tt.wantHeight)
 			}
-
-			// エラーのチェック
-			if _, ok := tt.msg.(error); ok {
-				if m.err == nil || m.err.Error() != tt.wantErr.Error() {
-					t.Errorf("Model.Update() err = %v, want %v", m.err, tt.wantErr)
-				}
-			}
-
-			// その他のコマンドチェック
-			if !tt.checkQuit && tt.wantCmd == nil && cmd != nil {
-				t.Errorf("Model.Update() cmd = %v, want nil", cmd)
+			if m.ready != tt.wantReady {
+				t.Errorf("Model.Update() ready = %v, want %v", m.ready, tt.wantReady)
 			}
 		})
 	}
 }
 
-// TestModel_View tests Viewメソッドのレンダリング
-func TestModel_View(t *testing.T) {
+// TestModel_Update_ErrorMessage tests エラーメッセージの処理
+func TestModel_Update_ErrorMessage(t *testing.T) {
+	model := NewModel()
+	testErr := errors.New("テストエラー")
+
+	updatedModel, cmd := model.Update(testErr)
+	m := updatedModel.(Model)
+
+	if m.err == nil || m.err.Error() != testErr.Error() {
+		t.Errorf("Model.Update() err = %v, want %v", m.err, testErr)
+	}
+
+	if cmd != nil {
+		t.Errorf("Model.Update() cmd = %v, want nil", cmd)
+	}
+}
+
+// TestModel_View_NotReady tests View未初期化状態の表示
+func TestModel_View_NotReady(t *testing.T) {
+	model := Model{
+		ready: false,
+	}
+
+	got := model.View()
+	want := InitializingMessage
+
+	if got != want {
+		t.Errorf("Model.View() = %v, want %v", got, want)
+	}
+}
+
+// TestModel_View_Error tests Viewエラー状態の表示
+func TestModel_View_Error(t *testing.T) {
+	model := Model{
+		ready: true,
+		err:   errors.New("テストエラー"),
+	}
+
+	got := model.View()
+	expectedContains := []string{
+		"エラー: テストエラー",
+		"qキーまたはCtrl+Cで終了",
+	}
+
+	for _, substr := range expectedContains {
+		if !strings.Contains(got, substr) {
+			t.Errorf("Model.View() does not contain %q, got %v", substr, got)
+		}
+	}
+}
+
+// TestModel_View_Normal tests View通常状態の表示
+func TestModel_View_Normal(t *testing.T) {
 	tests := []struct {
 		name     string
 		model    Model
-		want     string
 		contains []string
 	}{
 		{
-			name: "正常系_未初期化状態",
-			model: Model{
-				ready: false,
-			},
-			want: "初期化中...",
-		},
-		{
-			name: "正常系_エラー状態",
-			model: Model{
-				ready: true,
-				err:   errors.New("テストエラー"),
-			},
-			contains: []string{"エラー: テストエラー", "qキーまたはCtrl+Cで終了"},
-		},
-		{
-			name: "正常系_通常表示",
+			name: "カスタム出力",
 			model: Model{
 				ready:  true,
 				output: "テスト出力",
@@ -211,7 +240,7 @@ func TestModel_View(t *testing.T) {
 			},
 		},
 		{
-			name: "正常系_デフォルト表示",
+			name: "デフォルト出力",
 			model: func() Model {
 				m := NewModel()
 				m.ready = true
@@ -230,12 +259,6 @@ func TestModel_View(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.model.View()
 
-			// 完全一致のチェック
-			if tt.want != "" && got != tt.want {
-				t.Errorf("Model.View() = %v, want %v", got, tt.want)
-			}
-
-			// 部分文字列のチェック
 			for _, substr := range tt.contains {
 				if !strings.Contains(got, substr) {
 					t.Errorf("Model.View() does not contain %q, got %v", substr, got)
@@ -248,9 +271,9 @@ func TestModel_View(t *testing.T) {
 // TestKeyMsg_String tests キーメッセージの文字列変換
 func TestKeyMsg_String(t *testing.T) {
 	tests := []struct {
-		name    string
-		keyMsg  tea.KeyMsg
-		want    string
+		name   string
+		keyMsg tea.KeyMsg
+		want   string
 	}{
 		{
 			name:   "正常系_Ctrl+C",
@@ -289,42 +312,42 @@ func TestModel_Integration(t *testing.T) {
 	t.Run("統合テスト_初期化から終了まで", func(t *testing.T) {
 		// 1. モデルの作成
 		m := NewModel()
-		
+
 		// 2. 初期化
 		cmd := m.Init()
 		if cmd != nil {
 			t.Error("Init() should return nil")
 		}
-		
+
 		// 3. 初期表示の確認
 		view := m.View()
-		if view != "初期化中..." {
-			t.Errorf("Initial view = %v, want '初期化中...'", view)
+		if view != InitializingMessage {
+			t.Errorf("Initial view = %v, want %v", view, InitializingMessage)
 		}
-		
+
 		// 4. ウィンドウサイズの設定
 		updatedModel, _ := m.Update(tea.WindowSizeMsg{Width: 80, Height: 24})
 		m = updatedModel.(Model)
-		
+
 		if !m.ready {
 			t.Error("Model should be ready after window size message")
 		}
-		
+
 		// 5. 通常表示の確認
 		view = m.View()
 		if !strings.Contains(view, "ccforge") {
 			t.Errorf("View should contain 'ccforge', got %v", view)
 		}
-		
+
 		// 6. エラーの発生
 		updatedModel, _ = m.Update(errors.New("統合テストエラー"))
 		m = updatedModel.(Model)
-		
+
 		view = m.View()
 		if !strings.Contains(view, "統合テストエラー") {
 			t.Errorf("View should contain error message, got %v", view)
 		}
-		
+
 		// 7. 終了
 		_, cmd = m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'q'}})
 		if cmd == nil {
