@@ -1,8 +1,7 @@
-version: v1.50.0
+# golangci-lint configuration for ccforge project
 
 run:
   timeout: 5m
-  tests: true
 
 linters:
   enable:
@@ -33,27 +32,3 @@ linters:
     - unused
     - whitespace
     - prealloc
-
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-  govet:
-    check-shadowing: true
-  gocyclo:
-    min-complexity: 15
-  dupl:
-    threshold: 100
-  funlen:
-    lines: 100
-    statements: 50
-  goconst:
-    min-len: 2
-    min-occurrences: 2
-  lll:
-    line-length: 140
-  goimports:
-    local-prefixes: github.com/mzkmnk/ccforge
-
-issues:
-  max-issues-per-linter: 0
-  max-same-issues: 0
