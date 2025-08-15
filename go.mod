@@ -1,8 +1,6 @@
 module github.com/mzkmnk/ccforge
 
-go 1.23.0
-
-toolchain go1.24.6
+go 1.21
 
 require github.com/charmbracelet/bubbletea v1.3.6
 
