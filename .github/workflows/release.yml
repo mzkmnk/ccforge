@@ -24,13 +24,10 @@ jobs:
       with:
         go-version: '1.23'
     
-    - name: Download Dependencies
-      run: go mod download
-    
     - name: Run Tests
       run: go test -v ./...
     
-    - name: Setup and Run GoReleaser
+    - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v6
       with:
         distribution: goreleaser
@@ -38,42 +35,3 @@ jobs:
         args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-artifacts:
-    name: Build Artifacts
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            artifact_name: ccforge-linux-amd64
-            build_name: ccforge
-          - os: macos-latest
-            artifact_name: ccforge-darwin-amd64
-            build_name: ccforge
-          - os: windows-latest
-            artifact_name: ccforge-windows-amd64.exe
-            build_name: ccforge.exe
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.23'
-    
-    - name: Download Dependencies
-      run: go mod download
-    
-    - name: Build
-      run: |
-        go build -v -o ${{ matrix.build_name }} .
-    
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.artifact_name }}
-        path: ${{ matrix.build_name }}
