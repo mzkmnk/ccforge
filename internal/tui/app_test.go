@@ -11,20 +11,22 @@ import (
 // TestNewModel tests Model構造体の作成
 func TestNewModel(t *testing.T) {
 	tests := []struct {
-		name       string
-		wantOutput string
-		wantWidth  int
-		wantHeight int
-		wantReady  bool
-		wantErrNil bool
+		name          string
+		wantWidth     int
+		wantHeight    int
+		wantReady     bool
+		wantErrNil    bool
+		wantMainView  bool
+		wantStatusBar bool
 	}{
 		{
-			name:       "正常系_初期化時の状態",
-			wantOutput: "ccforge - Claude Code TUIアプリケーション\n準備完了",
-			wantWidth:  0,
-			wantHeight: 0,
-			wantReady:  false,
-			wantErrNil: true,
+			name:          "正常系_初期化時の状態",
+			wantWidth:     0,
+			wantHeight:    0,
+			wantReady:     false,
+			wantErrNil:    true,
+			wantMainView:  true,
+			wantStatusBar: true,
 		},
 	}
 
@@ -32,8 +34,11 @@ func TestNewModel(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			m := NewModel()
 
-			if m.output != tt.wantOutput {
-				t.Errorf("NewModel().output = %v, want %v", m.output, tt.wantOutput)
+			if m.mainView == nil && tt.wantMainView {
+				t.Error("NewModel().mainView should not be nil")
+			}
+			if m.statusBar == nil && tt.wantStatusBar {
+				t.Error("NewModel().statusBar should not be nil")
 			}
 			if m.width != tt.wantWidth {
 				t.Errorf("NewModel().width = %v, want %v", m.width, tt.wantWidth)
@@ -141,9 +146,11 @@ func TestModel_Update_WindowResize(t *testing.T) {
 		},
 		{
 			name: "正常系_ウィンドウサイズ変更_既にready",
-			model: Model{
-				ready: true,
-			},
+			model: func() Model {
+				m := NewModel()
+				m.ready = true
+				return m
+			}(),
 			msg:        tea.WindowSizeMsg{Width: 80, Height: 24},
 			wantWidth:  80,
 			wantHeight: 24,
@@ -228,15 +235,15 @@ func TestModel_View_Normal(t *testing.T) {
 		contains []string
 	}{
 		{
-			name: "カスタム出力",
-			model: Model{
-				ready:  true,
-				output: "テスト出力",
-			},
+			name: "コンポーネント初期化済み",
+			model: func() Model {
+				m := NewModel()
+				m.ready = true
+				return m
+			}(),
 			contains: []string{
-				"テスト出力",
-				"キーバインド:",
-				"q, Ctrl+C: 終了",
+				"ccforge",
+				"準備完了",
 			},
 		},
 		{
