@@ -107,14 +107,14 @@ func (e *EventHandler) HandleKeyboardMessage(model *Model, msg tea.KeyMsg) (*Mod
 	case "ctrl+c", "q":
 		// 終了
 		return model, tea.Quit
-	
+
 	case "f1":
 		// ヘルプ表示の切り替え
 		if model.statusBar != nil {
 			model.statusBar.ToggleHelp()
 		}
 		return model, nil
-	
+
 	case "ctrl+l":
 		// 画面クリア
 		if model.mainView != nil {
@@ -122,7 +122,7 @@ func (e *EventHandler) HandleKeyboardMessage(model *Model, msg tea.KeyMsg) (*Mod
 			model.mainView.AddOutput("画面をクリアしました")
 		}
 		return model, nil
-	
+
 	default:
 		// メインビューにキーイベントを渡す
 		if model.mainView != nil {
@@ -143,21 +143,21 @@ func (e *EventHandler) HandleProcessMessage(model *Model, msg ProcessMessage) (*
 	case ProcessOutput:
 		// プロセス出力を表示
 		model.mainView.AddOutput(msg.Output)
-	
+
 	case ProcessStarted:
 		// プロセス開始を表示
 		model.mainView.AddOutput(fmt.Sprintf("プロセス開始 (PID: %d)", msg.PID))
 		if model.statusBar != nil {
 			model.statusBar.SetStatus(fmt.Sprintf("プロセス実行中 (PID: %d)", msg.PID))
 		}
-	
+
 	case ProcessStopped:
 		// プロセス停止を表示
 		model.mainView.AddOutput(fmt.Sprintf("プロセス停止 (PID: %d)", msg.PID))
 		if model.statusBar != nil {
 			model.statusBar.SetStatus("待機中")
 		}
-	
+
 	case ProcessError:
 		// プロセスエラーを表示
 		model.mainView.AddOutput(fmt.Sprintf("プロセスエラー (PID: %d): %v", msg.PID, msg.Error))

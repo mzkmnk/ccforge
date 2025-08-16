@@ -22,10 +22,10 @@ func NewCommandDispatcher() *CommandDispatcher {
 	dispatcher := &CommandDispatcher{
 		handlers: make(map[string]CommandHandler),
 	}
-	
+
 	// 組み込みコマンドを登録
 	dispatcher.registerBuiltinCommands()
-	
+
 	return dispatcher
 }
 
@@ -35,17 +35,17 @@ func (d *CommandDispatcher) registerBuiltinCommands() {
 	d.handlers["clear"] = func(args []string) error {
 		return nil
 	}
-	
+
 	// helpコマンド
 	d.handlers["help"] = func(args []string) error {
 		return nil
 	}
-	
+
 	// exitコマンド
 	d.handlers["exit"] = func(args []string) error {
 		return nil
 	}
-	
+
 	// taskコマンド
 	d.handlers["task"] = func(args []string) error {
 		return nil

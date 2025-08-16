@@ -93,25 +93,25 @@ func TestEventHandler(t *testing.T) {
 func TestRegisterHandler(t *testing.T) {
 	handler := NewEventHandler()
 	model := NewModel()
-	
+
 	// カスタムメッセージ型
 	type CustomMessage struct {
 		Data string
 	}
-	
+
 	// カスタムハンドラーを登録
 	handled := false
 	customHandler := func(m *Model, msg tea.Msg) (*Model, tea.Cmd) {
 		handled = true
 		return m, nil
 	}
-	
+
 	handler.RegisterHandler("CustomMessage", customHandler)
-	
+
 	// カスタムメッセージを処理
 	customMsg := CustomMessage{Data: "test"}
 	_, _ = handler.Handle(&model, customMsg)
-	
+
 	if !handled {
 		t.Error("カスタムハンドラーが呼び出されませんでした")
 	}

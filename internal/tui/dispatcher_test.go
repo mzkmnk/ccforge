@@ -2,8 +2,6 @@ package tui
 
 import (
 	"testing"
-
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 // TestCommandDispatcher はコマンドディスパッチャーのテスト
@@ -71,11 +69,11 @@ func TestCommandDispatcher(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			handled, err := dispatcher.Dispatch(tt.command, tt.args)
-			
+
 			if handled != tt.wantHandled {
 				t.Errorf("Dispatch() handled = %v, want %v", handled, tt.wantHandled)
 			}
-			
+
 			if (err != nil) != tt.wantError {
 				t.Errorf("Dispatch() error = %v, wantError %v", err, tt.wantError)
 			}
@@ -86,16 +84,16 @@ func TestCommandDispatcher(t *testing.T) {
 // TestRegisterCommand はコマンド登録のテスト
 func TestRegisterCommand(t *testing.T) {
 	dispatcher := NewCommandDispatcher()
-	
+
 	// カスタムコマンドを登録
 	customHandled := false
 	customHandler := func(args []string) error {
 		customHandled = true
 		return nil
 	}
-	
+
 	dispatcher.Register("custom", customHandler)
-	
+
 	// 登録したコマンドが実行できることを確認
 	handled, err := dispatcher.Dispatch("custom", []string{})
 	if !handled {
@@ -160,11 +158,11 @@ func TestParseCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			command, args := dispatcher.ParseCommand(tt.input)
-			
+
 			if command != tt.wantCommand {
 				t.Errorf("ParseCommand() command = %v, want %v", command, tt.wantCommand)
 			}
-			
+
 			if len(args) != len(tt.wantArgs) {
 				t.Errorf("ParseCommand() args length = %v, want %v", len(args), len(tt.wantArgs))
 			} else {
@@ -182,19 +180,19 @@ func TestParseCommand(t *testing.T) {
 func TestDispatchToModel(t *testing.T) {
 	model := NewModel()
 	dispatcher := NewCommandDispatcher()
-	
+
 	// clearコマンドのテスト
 	cmd := dispatcher.DispatchToModel(&model, "clear", []string{})
 	if cmd != nil {
 		t.Error("clearコマンドは即座に実行されるべきでCmdを返すべきではありません")
 	}
-	
+
 	// exitコマンドのテスト
 	cmd = dispatcher.DispatchToModel(&model, "exit", []string{})
 	if cmd == nil {
 		t.Error("exitコマンドはtea.Quitを返すべきです")
 	}
-	
+
 	// 無効なコマンドのテスト
 	cmd = dispatcher.DispatchToModel(&model, "invalid", []string{})
 	if cmd != nil {
