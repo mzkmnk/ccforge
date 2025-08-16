@@ -1,5 +1,4 @@
-# golangci-lint v2.4.0用設定ファイル
-# 注意: golangci-lint-action@v7はv2.x系のみサポート
+version: "2"
 
 run:
   timeout: 5m
@@ -7,16 +6,17 @@ run:
 
 linters:
   enable:
-    - gofmt
     - govet
-    - golint
     - ineffassign
     - misspell
-  disable:
-    - funlen  # テスト関数が長いため無効化
+    - staticcheck
+
+formatters:
+  enable:
+    - gofmt
 
 issues:
-  exclude-use-default: false
-  exclude:
-    # テストファイルのfunlenを除外
-    - "Function '.+' is too long"
+  exclude-rules:
+    # テストファイルの長い関数を許可
+    - path: _test\.go
+      text: "Function '.+' is too long"
