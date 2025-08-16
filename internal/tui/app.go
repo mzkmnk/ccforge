@@ -96,12 +96,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	// メインビューの更新
-	if m.mainView != nil {
-		_, cmd = m.mainView.Update(msg)
-		cmds = append(cmds, cmd)
-	}
-
 	return m, tea.Batch(cmds...)
 }
 
