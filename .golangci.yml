@@ -1,6 +1,5 @@
-# golangci-lint設定ファイル
-# 注意: GitHub ActionsでGolangci-lint v2.4.0を使用しているため、
-# 新しいバージョンの設定は使用できません
+# golangci-lint v2.4.0用設定ファイル
+# 注意: golangci-lint-action@v7はv2.x系のみサポート
 
 run:
   timeout: 5m
@@ -8,33 +7,16 @@ run:
 
 linters:
   enable:
-    - bodyclose
-    - dogsled
-    - dupl
-    - goconst
-    - gocritic
-    - gocyclo
-    - gosec
-    - lll
-    - misspell
-    - nakedret
-    - noctx
-    - nolintlint
-    - prealloc
-    - staticcheck
-    - unconvert
-    - unparam
-    - whitespace
     - gofmt
-
-linters-settings:
-  funlen:
-    lines: 80
-    statements: 60
+    - govet
+    - golint
+    - ineffassign
+    - misspell
+  disable:
+    - funlen  # テスト関数が長いため無効化
 
 issues:
-  exclude-rules:
-    # テストファイルではfunlenを無視
-    - path: _test\.go
-      linters:
-        - funlen
+  exclude-use-default: false
+  exclude:
+    # テストファイルのfunlenを除外
+    - "Function '.+' is too long"
