@@ -32,8 +32,10 @@ type KeyboardMessage struct {
 	Key string
 	// Type はキーのタイプ
 	Type tea.KeyType
-	// Mod は修飾キー (Ctrl, Alt, Shift)
-	Mod tea.KeyMod
+	// Alt は Alt キーが押されているか
+	Alt bool
+	// Ctrl は Ctrl キーが押されているか
+	Ctrl bool
 }
 
 // ToTeaKeyMsg はKeyboardMessageをtea.KeyMsgに変換する
@@ -41,21 +43,15 @@ func (k KeyboardMessage) ToTeaKeyMsg() tea.KeyMsg {
 	msg := tea.KeyMsg{
 		Type: k.Type,
 	}
-	
+
 	// Runesの設定
 	if k.Type == tea.KeyRunes && len(k.Key) > 0 {
 		msg.Runes = []rune(k.Key)
 	}
-	
+
 	// 修飾キーの設定
-	if k.Mod&tea.ModCtrl != 0 {
-		msg.Alt = false
-		msg.Paste = false
-	}
-	if k.Mod&tea.ModAlt != 0 {
-		msg.Alt = true
-	}
-	
+	msg.Alt = k.Alt
+
 	return msg
 }
 

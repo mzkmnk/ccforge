@@ -10,7 +10,7 @@ import (
 func TestEventHandler(t *testing.T) {
 	handler := NewEventHandler()
 	model := NewModel()
-	
+
 	tests := []struct {
 		name       string
 		msg        tea.Msg
@@ -73,15 +73,15 @@ func TestEventHandler(t *testing.T) {
 			wantCmd:    false,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			updatedModel, cmd := handler.Handle(&model, tt.msg)
-			
+
 			if tt.wantUpdate && updatedModel == nil {
 				t.Error("Handle() モデルが更新されるべきですが、nilが返されました")
 			}
-			
+
 			if tt.wantCmd && cmd == nil {
 				t.Error("Handle() コマンドが返されるべきですが、nilが返されました")
 			}
@@ -121,7 +121,7 @@ func TestRegisterHandler(t *testing.T) {
 func TestHandleKeyboardMessage(t *testing.T) {
 	handler := NewEventHandler()
 	model := NewModel()
-	
+
 	tests := []struct {
 		name       string
 		key        tea.KeyMsg
@@ -163,17 +163,17 @@ func TestHandleKeyboardMessage(t *testing.T) {
 			wantUpdate: true,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			updatedModel, cmd := handler.HandleKeyboardMessage(&model, tt.key)
-			
+
 			if tt.wantQuit {
 				if cmd == nil {
 					t.Error("終了コマンドが返されるべきです")
 				}
 			}
-			
+
 			if tt.wantUpdate && updatedModel == nil {
 				t.Error("モデルが更新されるべきです")
 			}
@@ -185,7 +185,7 @@ func TestHandleKeyboardMessage(t *testing.T) {
 func TestHandleProcessMessage(t *testing.T) {
 	handler := NewEventHandler()
 	model := NewModel()
-	
+
 	tests := []struct {
 		name    string
 		msg     ProcessMessage
@@ -228,11 +228,11 @@ func TestHandleProcessMessage(t *testing.T) {
 			wantLog: true,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			updatedModel, _ := handler.HandleProcessMessage(&model, tt.msg)
-			
+
 			if updatedModel == nil {
 				t.Error("モデルが更新されるべきです")
 			}
@@ -244,7 +244,7 @@ func TestHandleProcessMessage(t *testing.T) {
 func TestHandleWindowResize(t *testing.T) {
 	handler := NewEventHandler()
 	model := NewModel()
-	
+
 	tests := []struct {
 		name       string
 		msg        WindowResizeMessage
@@ -270,15 +270,15 @@ func TestHandleWindowResize(t *testing.T) {
 			wantHeight: 60,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			updatedModel, _ := handler.HandleWindowResize(&model, tt.msg)
-			
+
 			if updatedModel == nil {
 				t.Error("モデルが更新されるべきです")
 			}
-			
+
 			if updatedModel != nil {
 				if updatedModel.width != tt.wantWidth {
 					t.Errorf("width = %v, want %v", updatedModel.width, tt.wantWidth)

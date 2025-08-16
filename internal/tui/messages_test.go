@@ -12,7 +12,8 @@ func TestKeyboardMessage(t *testing.T) {
 		name     string
 		msg      KeyboardMessage
 		wantKey  string
-		wantMod  tea.KeyMod
+		wantCtrl bool
+		wantAlt  bool
 		wantType tea.KeyType
 	}{
 		{
@@ -38,11 +39,11 @@ func TestKeyboardMessage(t *testing.T) {
 			msg: KeyboardMessage{
 				Key:  "c",
 				Type: tea.KeyRunes,
-				Mod:  tea.ModCtrl,
+				Ctrl: true,
 			},
 			wantKey:  "c",
 			wantType: tea.KeyRunes,
-			wantMod:  tea.ModCtrl,
+			wantCtrl: true,
 		},
 		{
 			name: "F1キー",
@@ -72,8 +73,11 @@ func TestKeyboardMessage(t *testing.T) {
 			if tt.msg.Type != tt.wantType {
 				t.Errorf("Type = %v, want %v", tt.msg.Type, tt.wantType)
 			}
-			if tt.msg.Mod != tt.wantMod {
-				t.Errorf("Mod = %v, want %v", tt.msg.Mod, tt.wantMod)
+			if tt.msg.Ctrl != tt.wantCtrl {
+				t.Errorf("Ctrl = %v, want %v", tt.msg.Ctrl, tt.wantCtrl)
+			}
+			if tt.msg.Alt != tt.wantAlt {
+				t.Errorf("Alt = %v, want %v", tt.msg.Alt, tt.wantAlt)
 			}
 		})
 	}
@@ -221,13 +225,12 @@ func TestConvertToTeaKeyMsg(t *testing.T) {
 			msg: KeyboardMessage{
 				Key:  "c",
 				Type: tea.KeyRunes,
-				Mod:  tea.ModCtrl,
+				Ctrl: true,
 			},
 			want: tea.KeyMsg{
 				Type:  tea.KeyRunes,
 				Runes: []rune{'c'},
 				Alt:   false,
-				Paste: false,
 			},
 		},
 	}
