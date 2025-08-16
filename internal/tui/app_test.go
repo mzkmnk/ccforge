@@ -256,8 +256,8 @@ func TestModel_View_Normal(t *testing.T) {
 			contains: []string{
 				"ccforge - Claude Code TUIアプリケーション",
 				"準備完了",
-				"キーバインド:",
-				"q, Ctrl+C: 終了",
+				"使い方:",
+				"Ctrl+Cまたはqで終了",
 			},
 		},
 	}

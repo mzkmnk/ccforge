@@ -53,6 +53,7 @@ func TestMainView_UpdateTextInput(t *testing.T) {
 			name: "文字列を追加入力",
 			initialView: &MainView{
 				input:       "hel",
+				cursorPos:   3,
 				outputLines: []string{},
 				width:       80,
 				height:      24,
@@ -64,6 +65,7 @@ func TestMainView_UpdateTextInput(t *testing.T) {
 			name: "バックスペースで文字削除",
 			initialView: &MainView{
 				input:       "hello",
+				cursorPos:   5,
 				outputLines: []string{},
 				width:       80,
 				height:      24,
@@ -193,6 +195,7 @@ func TestMainView_View(t *testing.T) {
 			mainView: &MainView{
 				outputLines: []string{"Line 1", "Line 2", "Line 3"},
 				input:       "test input",
+				cursorPos:   10, // "test input"の長さ
 				width:       80,
 				height:      10,
 			},
@@ -200,7 +203,7 @@ func TestMainView_View(t *testing.T) {
 				"Line 1",
 				"Line 2",
 				"Line 3",
-				"> test input",
+				"test input",
 			},
 		},
 		{
@@ -314,9 +317,9 @@ func TestMainView_ScrollBounds(t *testing.T) {
 			name:                "下端を超えてスクロールしない",
 			outputLinesCount:    10,
 			height:              5,
-			initialScrollOffset: 6,
+			initialScrollOffset: 8,
 			scrollDirection:     "down",
-			wantScrollOffset:    6,
+			wantScrollOffset:    8,
 		},
 	}
 

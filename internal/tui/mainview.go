@@ -239,10 +239,12 @@ func (m *MainView) getVisibleLines() []string {
 // getMaxScroll は最大スクロール位置を取得する
 func (m *MainView) getMaxScroll() int {
 	visibleHeight := m.height - 3
-	maxScroll := len(m.outputLines) - visibleHeight
-	if maxScroll < 0 {
-		maxScroll = 0
+	// 表示可能な行数よりも出力行が多い場合のみスクロール可能
+	if len(m.outputLines) <= visibleHeight {
+		return 0
 	}
+	// 最後の行まで表示できる最大スクロール位置
+	maxScroll := len(m.outputLines) - visibleHeight
 	return maxScroll
 }
 
