@@ -1,22 +1,25 @@
 version: "2"
-
-run:
-  timeout: 5m
-  tests: true
-
 linters:
   enable:
-    - govet
-    - ineffassign
+    - bodyclose
+    - dogsled
+    - dupl
+    - funlen
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - lll
     - misspell
+    - nakedret
+    - noctx
+    - nolintlint
+    - prealloc
     - staticcheck
-
+    - unconvert
+    - unparam
+    - whitespace
 formatters:
   enable:
     - gofmt
-
-issues:
-  exclude-rules:
-    # テストファイルの長い関数を許可
-    - path: _test\.go
-      text: "Function '.+' is too long"
+    - goimports
