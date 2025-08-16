@@ -348,6 +348,13 @@ func TestMainView_ScrollBounds(t *testing.T) {
 
 // TestMainView_ScrollBoundaryEdgeCases はエッジケースでのスクロール境界処理をテストする
 func TestMainView_ScrollBoundaryEdgeCases(t *testing.T) {
+	t.Run("空のリスト", testScrollBoundaryEmptyList)
+	t.Run("不正な初期値", testScrollBoundaryInvalidInitialValues)
+	t.Run("ページング", testScrollBoundaryPaging)
+}
+
+// testScrollBoundaryEmptyList は空のリストでのスクロール境界処理をテストする
+func testScrollBoundaryEmptyList(t *testing.T) {
 	tests := []struct {
 		name             string
 		outputLinesCount int
@@ -384,6 +391,35 @@ func TestMainView_ScrollBoundaryEdgeCases(t *testing.T) {
 			wantScrollOffset: 0,
 			description:      "表示可能行数より少ない場合はスクロールしない",
 		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mv := &MainView{
+				outputLines:  generateTestLines(tt.outputLinesCount),
+				scrollOffset: tt.scrollOffset,
+				width:        80,
+				height:       tt.height,
+			}
+
+			tt.operation(mv)
+
+			assert.Equal(t, tt.wantScrollOffset, mv.scrollOffset, tt.description)
+		})
+	}
+}
+
+// testScrollBoundaryInvalidInitialValues は不正な初期値でのスクロール境界処理をテストする
+func testScrollBoundaryInvalidInitialValues(t *testing.T) {
+	tests := []struct {
+		name             string
+		outputLinesCount int
+		height           int
+		scrollOffset     int
+		operation        func(*MainView)
+		wantScrollOffset int
+		description      string
+	}{
 		{
 			name:             "負のスクロール位置からの修正",
 			outputLinesCount: 10,
@@ -402,6 +438,35 @@ func TestMainView_ScrollBoundaryEdgeCases(t *testing.T) {
 			wantScrollOffset: 8, // maxScroll = 10 - (5-3) = 8
 			description:      "過大な値は最大値に修正される",
 		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mv := &MainView{
+				outputLines:  generateTestLines(tt.outputLinesCount),
+				scrollOffset: tt.scrollOffset,
+				width:        80,
+				height:       tt.height,
+			}
+
+			tt.operation(mv)
+
+			assert.Equal(t, tt.wantScrollOffset, mv.scrollOffset, tt.description)
+		})
+	}
+}
+
+// testScrollBoundaryPaging はページングでの境界処理をテストする
+func testScrollBoundaryPaging(t *testing.T) {
+	tests := []struct {
+		name             string
+		outputLinesCount int
+		height           int
+		scrollOffset     int
+		operation        func(*MainView)
+		wantScrollOffset int
+		description      string
+	}{
 		{
 			name:             "ページアップでの境界処理",
 			outputLinesCount: 20,
@@ -559,6 +624,12 @@ func TestMainView_GetMaxScrollEdgeCases(t *testing.T) {
 
 // TestMainView_MultibyteCharacterInput はマルチバイト文字入力のテスト
 func TestMainView_MultibyteCharacterInput(t *testing.T) {
+	t.Run("日本語入力", testMultibyteJapaneseInput)
+	t.Run("絵文字入力", testMultibyteEmojiInput)
+}
+
+// testMultibyteJapaneseInput は日本語文字入力のテスト
+func testMultibyteJapaneseInput(t *testing.T) {
 	tests := []struct {
 		name          string
 		initialInput  string
@@ -599,6 +670,46 @@ func TestMainView_MultibyteCharacterInput(t *testing.T) {
 			wantCursorPos: 3, // "こんに" の後
 			description:   "日本語文字列の途中への挿入が正しく処理される",
 		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mv := &MainView{
+				input:       tt.initialInput,
+				cursorPos:   tt.initialCursor,
+				outputLines: []string{},
+				width:       80,
+				height:      24,
+			}
+
+			// 文字入力のシミュレーション
+			for _, r := range tt.inputRunes {
+				mv.handleTextInput(string(r))
+			}
+
+			// 追加の操作があれば実行
+			if tt.operation != nil {
+				tt.operation(mv)
+			}
+
+			assert.Equal(t, tt.wantInput, mv.input, tt.description)
+			assert.Equal(t, tt.wantCursorPos, mv.cursorPos, "カーソル位置が正しい")
+		})
+	}
+}
+
+// testMultibyteEmojiInput は絵文字入力のテスト
+func testMultibyteEmojiInput(t *testing.T) {
+	tests := []struct {
+		name          string
+		initialInput  string
+		initialCursor int
+		inputRunes    []rune
+		operation     func(*MainView)
+		wantInput     string
+		wantCursorPos int
+		description   string
+	}{
 		{
 			name:          "絵文字の入力",
 			initialInput:  "test",
