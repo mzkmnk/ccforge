@@ -185,17 +185,17 @@ func TestStatusBar_ViewHelp(t *testing.T) {
 		showHelp:         true,
 		width:            80,
 	}
-	
+
 	sbWithoutHelp := &StatusBar{
 		activeTask:       "test",
 		connectionStatus: Connected,
 		showHelp:         false,
 		width:            80,
 	}
-	
+
 	viewWithHelp := sbWithHelp.View()
 	viewWithoutHelp := sbWithoutHelp.View()
-	
+
 	assert.Contains(t, viewWithHelp, "F1: ヘルプ")
 	assert.NotContains(t, viewWithoutHelp, "F1: ヘルプ")
 }

@@ -17,7 +17,7 @@ const (
 	Connecting
 	// Connected は接続済み状態
 	Connected
-	
+
 	// statusIcon は接続状態アイコン
 	statusIcon = "●"
 )

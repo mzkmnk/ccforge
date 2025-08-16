@@ -153,11 +153,11 @@ func TestMainView_UpdateEnter(t *testing.T) {
 		width:       80,
 		height:      24,
 	}
-	
+
 	updatedView, _ := mv.Update(tea.KeyMsg{Type: tea.KeyEnter})
 	newMV, ok := updatedView.(*MainView)
 	require.True(t, ok)
-	
+
 	assert.Equal(t, "", newMV.input)
 	assert.Equal(t, []string{"previous output", "> test command"}, newMV.outputLines)
 }
@@ -168,16 +168,16 @@ func TestMainView_UpdateWindowSize(t *testing.T) {
 		height:      24,
 		outputLines: []string{},
 	}
-	
+
 	msg := tea.WindowSizeMsg{
 		Width:  100,
 		Height: 30,
 	}
-	
+
 	updatedView, _ := mv.Update(msg)
 	newMV, ok := updatedView.(*MainView)
 	require.True(t, ok)
-	
+
 	assert.Equal(t, 100, newMV.width)
 	assert.Equal(t, 30, newMV.height)
 }

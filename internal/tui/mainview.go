@@ -146,7 +146,7 @@ func (m *MainView) moveCursorLeft() {
 	}
 }
 
-// moveCursorRight はカーソルを右に移動する  
+// moveCursorRight はカーソルを右に移動する
 func (m *MainView) moveCursorRight() {
 	if m.cursorPos < len(m.input) {
 		m.cursorPos++
