@@ -131,7 +131,7 @@ func TestHandleKeyboardMessage(t *testing.T) {
 		{
 			name: "Ctrl+C（終了）",
 			key: tea.KeyMsg{
-				Type:  tea.KeyCtrlC,
+				Type: tea.KeyCtrlC,
 			},
 			wantQuit:   true,
 			wantUpdate: false,

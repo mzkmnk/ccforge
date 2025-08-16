@@ -63,13 +63,13 @@ func (d *CommandDispatcher) Dispatch(command string, args []string) (bool, error
 	if command == "" {
 		return false, errors.New("コマンドが指定されていません")
 	}
-	
+
 	// ハンドラーを探す
 	handler, exists := d.handlers[command]
 	if !exists {
 		return false, fmt.Errorf("未知のコマンド: %s", command)
 	}
-	
+
 	// ハンドラーを実行
 	err := handler(args)
 	return true, err
@@ -79,25 +79,25 @@ func (d *CommandDispatcher) Dispatch(command string, args []string) (bool, error
 func (d *CommandDispatcher) ParseCommand(input string) (string, []string) {
 	// 前後の空白を削除
 	input = strings.TrimSpace(input)
-	
+
 	// 空文字列の場合
 	if input == "" {
 		return "", []string{}
 	}
-	
+
 	// スペースで分割
 	parts := strings.Fields(input)
 	if len(parts) == 0 {
 		return "", []string{}
 	}
-	
+
 	// 最初の要素がコマンド、残りが引数
 	command := parts[0]
 	args := []string{}
 	if len(parts) > 1 {
 		args = parts[1:]
 	}
-	
+
 	return command, args
 }
 
@@ -111,11 +111,11 @@ func (d *CommandDispatcher) DispatchToModel(model *Model, command string, args [
 			model.mainView.AddOutput("画面をクリアしました")
 		}
 		return nil
-		
+
 	case "exit":
 		// アプリケーション終了
 		return tea.Quit
-		
+
 	case "help":
 		// ヘルプ表示
 		if model.mainView != nil {
@@ -126,7 +126,7 @@ func (d *CommandDispatcher) DispatchToModel(model *Model, command string, args [
 			model.mainView.AddOutput("  exit  - アプリケーションを終了")
 		}
 		return nil
-		
+
 	case "task":
 		// タスク切り替え
 		if model.mainView != nil {
@@ -137,7 +137,7 @@ func (d *CommandDispatcher) DispatchToModel(model *Model, command string, args [
 			}
 		}
 		return nil
-		
+
 	default:
 		// 未知のコマンド
 		if model.mainView != nil {
