@@ -182,22 +182,22 @@ func TestModel_Update_ErrorMessage(t *testing.T) {
 	// ウィンドウサイズを設定してreadyにする
 	updatedModel, _ := model.Update(tea.WindowSizeMsg{Width: 80, Height: 24})
 	model = updatedModel.(Model)
-	
+
 	testErr := errors.New("テストエラー")
 
 	// mainViewのポインタアドレスを確認（デバッグ用）
 	originalMainView := model.mainView
 	t.Logf("Original mainView pointer: %p", originalMainView)
-	
+
 	updatedModel, cmd := model.Update(testErr)
 	m := updatedModel.(Model)
-	
+
 	t.Logf("Updated mainView pointer: %p", m.mainView)
 	t.Logf("Are they the same? %v", originalMainView == m.mainView)
 
 	// 値レシーバーのため、m.errの変更は反映されない
 	// エラーメッセージがmainViewに追加されることを確認するのが適切
-	
+
 	// mainViewがnilでないことを確認
 	if m.mainView == nil {
 		t.Fatal("mainView should not be nil")
@@ -206,7 +206,7 @@ func TestModel_Update_ErrorMessage(t *testing.T) {
 	if cmd != nil {
 		t.Errorf("Model.Update() cmd = %v, want nil", cmd)
 	}
-	
+
 	// mainViewに直接エラーメッセージが追加されているか確認
 	// （初期メッセージ8行 + エラーメッセージ1行 = 9行）
 	if len(m.mainView.outputLines) < 9 {
@@ -215,8 +215,8 @@ func TestModel_Update_ErrorMessage(t *testing.T) {
 			t.Logf("Line %d: %s", i, line)
 		}
 	}
-	
-	// ViewにエラーメッセージBが表示されることを確認
+
+	// Viewにエラーメッセージが表示されることを確認
 	view := m.View()
 	if !strings.Contains(view, "エラー: テストエラー") {
 		// デバッグ出力
