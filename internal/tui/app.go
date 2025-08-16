@@ -14,18 +14,20 @@ const (
 
 // Model はTUIアプリケーションの状態を管理する構造体
 type Model struct {
-	width     int        // ターミナル幅
-	height    int        // ターミナル高さ
-	ready     bool       // 初期化完了フラグ
-	err       error      // エラー状態
-	mainView  *MainView  // メインビューコンポーネント
-	statusBar *StatusBar // ステータスバーコンポーネント
+	width        int           // ターミナル幅
+	height       int           // ターミナル高さ
+	ready        bool          // 初期化完了フラグ
+	err          error         // エラー状態
+	mainView     *MainView     // メインビューコンポーネント
+	statusBar    *StatusBar    // ステータスバーコンポーネント
+	eventHandler *EventHandler // イベントハンドラー
 }
 
 // NewModel は新しいModelを作成する
 func NewModel() Model {
 	mainView := NewMainView()
 	statusBar := NewStatusBar()
+	eventHandler := NewEventHandler()
 
 	// 初期メッセージを追加
 	mainView.AddOutput("ccforge - Claude Code TUIアプリケーション")
@@ -38,8 +40,9 @@ func NewModel() Model {
 	mainView.AddOutput("  - Ctrl+Cまたはqで終了")
 
 	return Model{
-		mainView:  mainView,
-		statusBar: statusBar,
+		mainView:     mainView,
+		statusBar:    statusBar,
+		eventHandler: eventHandler,
 	}
 }
 
@@ -51,6 +54,15 @@ func (m Model) Init() tea.Cmd {
 
 // Update はメッセージを受け取って状態を更新する
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// イベントハンドラーがある場合はそちらを使用
+	if m.eventHandler != nil {
+		updatedModel, cmd := m.eventHandler.Handle(&m, msg)
+		if updatedModel != nil {
+			return *updatedModel, cmd
+		}
+	}
+
+	// フォールバック処理（互換性のため）
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 
