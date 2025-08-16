@@ -34,87 +34,7 @@ func NewMainView() *MainView {
 func (m *MainView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.Type {
-		case tea.KeyRunes:
-			// 文字入力
-			runes := string(msg.Runes)
-			m.input = m.input[:m.cursorPos] + runes + m.input[m.cursorPos:]
-			m.cursorPos += len(runes)
-
-		case tea.KeyBackspace:
-			// バックスペース
-			if m.cursorPos > 0 {
-				m.input = m.input[:m.cursorPos-1] + m.input[m.cursorPos:]
-				m.cursorPos--
-			}
-
-		case tea.KeyDelete:
-			// デリートキー
-			if m.cursorPos < len(m.input) {
-				m.input = m.input[:m.cursorPos] + m.input[m.cursorPos+1:]
-			}
-
-		case tea.KeyEnter:
-			// エンターキー - コマンドを実行
-			if m.input != "" {
-				m.outputLines = append(m.outputLines, "> "+m.input)
-				m.input = ""
-				m.cursorPos = 0
-				// 自動スクロール
-				m.autoScroll()
-			}
-
-		case tea.KeyUp:
-			// 上矢印 - スクロールアップ
-			if m.scrollOffset > 0 {
-				m.scrollOffset--
-			}
-
-		case tea.KeyDown:
-			// 下矢印 - スクロールダウン
-			maxScroll := m.getMaxScroll()
-			if m.scrollOffset < maxScroll {
-				m.scrollOffset++
-			}
-
-		case tea.KeyPgUp:
-			// Page Up - ページ単位でスクロールアップ
-			scrollAmount := m.height - 5
-			m.scrollOffset -= scrollAmount
-			if m.scrollOffset < 0 {
-				m.scrollOffset = 0
-			}
-
-		case tea.KeyPgDown:
-			// Page Down - ページ単位でスクロールダウン
-			scrollAmount := m.height - 5
-			m.scrollOffset += scrollAmount
-			maxScroll := m.getMaxScroll()
-			if m.scrollOffset > maxScroll {
-				m.scrollOffset = maxScroll
-			}
-
-		case tea.KeyLeft:
-			// 左矢印 - カーソルを左に移動
-			if m.cursorPos > 0 {
-				m.cursorPos--
-			}
-
-		case tea.KeyRight:
-			// 右矢印 - カーソルを右に移動
-			if m.cursorPos < len(m.input) {
-				m.cursorPos++
-			}
-
-		case tea.KeyHome:
-			// Home - カーソルを行頭に移動
-			m.cursorPos = 0
-
-		case tea.KeyEnd:
-			// End - カーソルを行末に移動
-			m.cursorPos = len(m.input)
-		}
-
+		m.handleKeyMsg(msg)
 	case tea.WindowSizeMsg:
 		// ウィンドウサイズ変更
 		m.width = msg.Width
@@ -122,6 +42,115 @@ func (m *MainView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	return m, nil
+}
+
+// handleKeyMsg はキーボード入力を処理する
+func (m *MainView) handleKeyMsg(msg tea.KeyMsg) {
+	switch msg.Type {
+	case tea.KeyRunes:
+		m.handleTextInput(string(msg.Runes))
+	case tea.KeyBackspace:
+		m.handleBackspace()
+	case tea.KeyDelete:
+		m.handleDelete()
+	case tea.KeyEnter:
+		m.handleEnter()
+	case tea.KeyUp:
+		m.scrollUp()
+	case tea.KeyDown:
+		m.scrollDown()
+	case tea.KeyPgUp:
+		m.pageUp()
+	case tea.KeyPgDown:
+		m.pageDown()
+	case tea.KeyLeft:
+		m.moveCursorLeft()
+	case tea.KeyRight:
+		m.moveCursorRight()
+	case tea.KeyHome:
+		m.cursorPos = 0
+	case tea.KeyEnd:
+		m.cursorPos = len(m.input)
+	}
+}
+
+// handleTextInput は文字入力を処理する
+func (m *MainView) handleTextInput(text string) {
+	m.input = m.input[:m.cursorPos] + text + m.input[m.cursorPos:]
+	m.cursorPos += len(text)
+}
+
+// handleBackspace はバックスペースキーを処理する
+func (m *MainView) handleBackspace() {
+	if m.cursorPos > 0 {
+		m.input = m.input[:m.cursorPos-1] + m.input[m.cursorPos:]
+		m.cursorPos--
+	}
+}
+
+// handleDelete はデリートキーを処理する
+func (m *MainView) handleDelete() {
+	if m.cursorPos < len(m.input) {
+		m.input = m.input[:m.cursorPos] + m.input[m.cursorPos+1:]
+	}
+}
+
+// handleEnter はエンターキーを処理する
+func (m *MainView) handleEnter() {
+	if m.input != "" {
+		m.outputLines = append(m.outputLines, "> "+m.input)
+		m.input = ""
+		m.cursorPos = 0
+		m.autoScroll()
+	}
+}
+
+// scrollUp は上方向へのスクロールを処理する
+func (m *MainView) scrollUp() {
+	if m.scrollOffset > 0 {
+		m.scrollOffset--
+	}
+}
+
+// scrollDown は下方向へのスクロールを処理する
+func (m *MainView) scrollDown() {
+	maxScroll := m.getMaxScroll()
+	if m.scrollOffset < maxScroll {
+		m.scrollOffset++
+	}
+}
+
+// pageUp はページアップを処理する
+func (m *MainView) pageUp() {
+	scrollAmount := m.height - 5
+	m.scrollOffset -= scrollAmount
+	if m.scrollOffset < 0 {
+		m.scrollOffset = 0
+	}
+}
+
+// pageDown はページダウンを処理する
+func (m *MainView) pageDown() {
+	scrollAmount := m.height - 5
+	m.scrollOffset += scrollAmount
+	maxScroll := m.getMaxScroll()
+	if m.scrollOffset > maxScroll {
+		m.scrollOffset = maxScroll
+	}
+}
+
+// moveCursorLeft はカーソルを左に移動する
+func (m *MainView) moveCursorLeft() {
+	if m.cursorPos > 0 {
+		m.cursorPos--
+	}
+}
+
+// moveCursorRight はカーソルを右に移動する  
+func (m *MainView) moveCursorRight() {
+	if m.cursorPos < len(m.input) {
+		m.cursorPos++
+	}
 }
 
 // View は現在の状態を文字列として描画する
@@ -147,7 +176,7 @@ func (m *MainView) View() string {
 	// スクロールインジケーター
 	if m.needsScrollIndicator() {
 		scrollInfo := fmt.Sprintf(" [%d/%d]", m.scrollOffset+1, len(m.outputLines))
-		outputContent = outputContent + scrollInfo
+		outputContent += scrollInfo
 	}
 
 	// 入力行の構築

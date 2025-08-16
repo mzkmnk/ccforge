@@ -36,21 +36,17 @@ func TestMainView_NewMainView(t *testing.T) {
 	}
 }
 
-func TestMainView_Update(t *testing.T) {
+func TestMainView_UpdateTextInput(t *testing.T) {
 	tests := []struct {
-		name            string
-		initialView     *MainView
-		msg             tea.Msg
-		wantCmd         tea.Cmd
-		wantInput       string
-		wantOutputLines []string
-		wantScroll      int
+		name        string
+		initialView *MainView
+		msg         tea.Msg
+		wantInput   string
 	}{
 		{
 			name:        "文字入力",
 			initialView: NewMainView(),
 			msg:         tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'h'}},
-			wantCmd:     nil,
 			wantInput:   "h",
 		},
 		{
@@ -62,7 +58,6 @@ func TestMainView_Update(t *testing.T) {
 				height:      24,
 			},
 			msg:       tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'l'}},
-			wantCmd:   nil,
 			wantInput: "hell",
 		},
 		{
@@ -74,22 +69,27 @@ func TestMainView_Update(t *testing.T) {
 				height:      24,
 			},
 			msg:       tea.KeyMsg{Type: tea.KeyBackspace},
-			wantCmd:   nil,
 			wantInput: "hell",
 		},
-		{
-			name: "Enterキーで入力を出力に追加",
-			initialView: &MainView{
-				input:       "test command",
-				outputLines: []string{"previous output"},
-				width:       80,
-				height:      24,
-			},
-			msg:             tea.KeyMsg{Type: tea.KeyEnter},
-			wantCmd:         nil,
-			wantInput:       "",
-			wantOutputLines: []string{"previous output", "> test command"},
-		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			updatedView, _ := tt.initialView.Update(tt.msg)
+			mv, ok := updatedView.(*MainView)
+			require.True(t, ok)
+			assert.Equal(t, tt.wantInput, mv.input)
+		})
+	}
+}
+
+func TestMainView_UpdateScroll(t *testing.T) {
+	tests := []struct {
+		name        string
+		initialView *MainView
+		msg         tea.Msg
+		wantScroll  int
+	}{
 		{
 			name: "上矢印でスクロールアップ",
 			initialView: &MainView{
@@ -99,7 +99,6 @@ func TestMainView_Update(t *testing.T) {
 				height:       24,
 			},
 			msg:        tea.KeyMsg{Type: tea.KeyUp},
-			wantCmd:    nil,
 			wantScroll: 9,
 		},
 		{
@@ -111,7 +110,6 @@ func TestMainView_Update(t *testing.T) {
 				height:       24,
 			},
 			msg:        tea.KeyMsg{Type: tea.KeyDown},
-			wantCmd:    nil,
 			wantScroll: 6,
 		},
 		{
@@ -123,8 +121,7 @@ func TestMainView_Update(t *testing.T) {
 				height:       10,
 			},
 			msg:        tea.KeyMsg{Type: tea.KeyPgUp},
-			wantCmd:    nil,
-			wantScroll: 15, // height-5だけスクロール
+			wantScroll: 15,
 		},
 		{
 			name: "Page Downでページ単位スクロールダウン",
@@ -135,51 +132,54 @@ func TestMainView_Update(t *testing.T) {
 				height:       10,
 			},
 			msg:        tea.KeyMsg{Type: tea.KeyPgDown},
-			wantCmd:    nil,
-			wantScroll: 15, // height-5だけスクロール
-		},
-		{
-			name: "ウィンドウサイズ変更",
-			initialView: &MainView{
-				width:       80,
-				height:      24,
-				outputLines: []string{},
-			},
-			msg: tea.WindowSizeMsg{
-				Width:  100,
-				Height: 30,
-			},
-			wantCmd: nil,
+			wantScroll: 15,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			updatedView, cmd := tt.initialView.Update(tt.msg)
-
+			updatedView, _ := tt.initialView.Update(tt.msg)
 			mv, ok := updatedView.(*MainView)
 			require.True(t, ok)
-
-			if tt.wantInput != "" || tt.initialView.input != "" {
-				assert.Equal(t, tt.wantInput, mv.input)
-			}
-
-			if tt.wantOutputLines != nil {
-				assert.Equal(t, tt.wantOutputLines, mv.outputLines)
-			}
-
-			if tt.wantScroll != 0 || tt.name == "上矢印でスクロールアップ" || tt.name == "下矢印でスクロールダウン" {
-				assert.Equal(t, tt.wantScroll, mv.scrollOffset)
-			}
-
-			if winMsg, ok := tt.msg.(tea.WindowSizeMsg); ok {
-				assert.Equal(t, winMsg.Width, mv.width)
-				assert.Equal(t, winMsg.Height, mv.height)
-			}
-
-			assert.Equal(t, tt.wantCmd, cmd)
+			assert.Equal(t, tt.wantScroll, mv.scrollOffset)
 		})
 	}
+}
+
+func TestMainView_UpdateEnter(t *testing.T) {
+	mv := &MainView{
+		input:       "test command",
+		outputLines: []string{"previous output"},
+		width:       80,
+		height:      24,
+	}
+	
+	updatedView, _ := mv.Update(tea.KeyMsg{Type: tea.KeyEnter})
+	newMV, ok := updatedView.(*MainView)
+	require.True(t, ok)
+	
+	assert.Equal(t, "", newMV.input)
+	assert.Equal(t, []string{"previous output", "> test command"}, newMV.outputLines)
+}
+
+func TestMainView_UpdateWindowSize(t *testing.T) {
+	mv := &MainView{
+		width:       80,
+		height:      24,
+		outputLines: []string{},
+	}
+	
+	msg := tea.WindowSizeMsg{
+		Width:  100,
+		Height: 30,
+	}
+	
+	updatedView, _ := mv.Update(msg)
+	newMV, ok := updatedView.(*MainView)
+	require.True(t, ok)
+	
+	assert.Equal(t, 100, newMV.width)
+	assert.Equal(t, 30, newMV.height)
 }
 
 func TestMainView_View(t *testing.T) {

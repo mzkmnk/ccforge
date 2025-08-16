@@ -17,6 +17,9 @@ const (
 	Connecting
 	// Connected は接続済み状態
 	Connected
+	
+	// statusIcon は接続状態アイコン
+	statusIcon = "●"
 )
 
 // StatusBar はステータスバーコンポーネント
@@ -67,19 +70,19 @@ func (s *StatusBar) View() string {
 
 	// 左側: タスク情報
 	taskText := s.getTaskText()
-	taskStyle := baseStyle.Copy().
+	taskStyle := baseStyle.
 		Padding(0, 1).
 		Align(lipgloss.Left)
 
 	// 中央: 接続状態
 	connectionText := s.getConnectionStatusText()
-	connectionStyle := baseStyle.Copy().
+	connectionStyle := baseStyle.
 		Padding(0, 1).
 		Align(lipgloss.Center)
 
 	// 右側: ヘルプ
 	helpText := s.getHelpText()
-	helpStyle := baseStyle.Copy().
+	helpStyle := baseStyle.
 		Padding(0, 1).
 		Align(lipgloss.Right)
 
@@ -122,25 +125,20 @@ func (s *StatusBar) getTaskText() string {
 
 // getConnectionStatusText は接続状態の表示テキストを取得する
 func (s *StatusBar) getConnectionStatusText() string {
-	var statusIcon string
 	var statusText string
 	var statusColor lipgloss.Color
 
 	switch s.connectionStatus {
 	case Connected:
-		statusIcon = "●"
 		statusText = "接続済み"
 		statusColor = lipgloss.Color("42") // 緑
 	case Connecting:
-		statusIcon = "●"
 		statusText = "接続中..."
 		statusColor = lipgloss.Color("226") // 黄色
 	case Disconnected:
-		statusIcon = "●"
 		statusText = "切断"
 		statusColor = lipgloss.Color("196") // 赤
 	default:
-		statusIcon = "●"
 		statusText = "不明"
 		statusColor = lipgloss.Color("245") // グレー
 	}

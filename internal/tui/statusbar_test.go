@@ -109,68 +109,21 @@ func TestStatusBar_ToggleHelp(t *testing.T) {
 	assert.True(t, sb.showHelp)
 }
 
-func TestStatusBar_View(t *testing.T) {
+func TestStatusBar_ViewTask(t *testing.T) {
 	tests := []struct {
-		name             string
-		activeTask       string
-		connectionStatus ConnectionStatus
-		showHelp         bool
-		width            int
-		wantContains     []string
-		wantNotContains  []string
+		name         string
+		activeTask   string
+		wantContains string
 	}{
 		{
-			name:             "アクティブタスクと接続状態を表示",
-			activeTask:       "タスク1",
-			connectionStatus: Connected,
-			showHelp:         true,
-			width:            80,
-			wantContains: []string{
-				"タスク: タスク1",
-				"接続済み",
-				"F1: ヘルプ",
-			},
-			wantNotContains: []string{},
+			name:         "アクティブタスクあり",
+			activeTask:   "タスク1",
+			wantContains: "タスク: タスク1",
 		},
 		{
-			name:             "タスクなし、切断状態",
-			activeTask:       "",
-			connectionStatus: Disconnected,
-			showHelp:         true,
-			width:            80,
-			wantContains: []string{
-				"タスク: なし",
-				"切断",
-				"F1: ヘルプ",
-			},
-			wantNotContains: []string{},
-		},
-		{
-			name:             "接続中状態",
-			activeTask:       "タスク2",
-			connectionStatus: Connecting,
-			showHelp:         true,
-			width:            80,
-			wantContains: []string{
-				"タスク: タスク2",
-				"接続中...",
-				"F1: ヘルプ",
-			},
-			wantNotContains: []string{},
-		},
-		{
-			name:             "ヘルプ非表示",
-			activeTask:       "タスク3",
-			connectionStatus: Connected,
-			showHelp:         false,
-			width:            80,
-			wantContains: []string{
-				"タスク: タスク3",
-				"接続済み",
-			},
-			wantNotContains: []string{
-				"F1: ヘルプ",
-			},
+			name:         "アクティブタスクなし",
+			activeTask:   "",
+			wantContains: "タスク: なし",
 		},
 	}
 
@@ -178,24 +131,73 @@ func TestStatusBar_View(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sb := &StatusBar{
 				activeTask:       tt.activeTask,
-				connectionStatus: tt.connectionStatus,
-				showHelp:         tt.showHelp,
-				width:            tt.width,
+				connectionStatus: Connected,
+				showHelp:         true,
+				width:            80,
 			}
-
 			view := sb.View()
-
-			// 含まれるべき文字列のチェック
-			for _, want := range tt.wantContains {
-				assert.Contains(t, view, want)
-			}
-
-			// 含まれないべき文字列のチェック
-			for _, notWant := range tt.wantNotContains {
-				assert.NotContains(t, view, notWant)
-			}
+			assert.Contains(t, view, tt.wantContains)
 		})
 	}
+}
+
+func TestStatusBar_ViewConnection(t *testing.T) {
+	tests := []struct {
+		name             string
+		connectionStatus ConnectionStatus
+		wantContains     string
+	}{
+		{
+			name:             "接続済み",
+			connectionStatus: Connected,
+			wantContains:     "接続済み",
+		},
+		{
+			name:             "切断",
+			connectionStatus: Disconnected,
+			wantContains:     "切断",
+		},
+		{
+			name:             "接続中",
+			connectionStatus: Connecting,
+			wantContains:     "接続中...",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sb := &StatusBar{
+				activeTask:       "test",
+				connectionStatus: tt.connectionStatus,
+				showHelp:         true,
+				width:            80,
+			}
+			view := sb.View()
+			assert.Contains(t, view, tt.wantContains)
+		})
+	}
+}
+
+func TestStatusBar_ViewHelp(t *testing.T) {
+	sbWithHelp := &StatusBar{
+		activeTask:       "test",
+		connectionStatus: Connected,
+		showHelp:         true,
+		width:            80,
+	}
+	
+	sbWithoutHelp := &StatusBar{
+		activeTask:       "test",
+		connectionStatus: Connected,
+		showHelp:         false,
+		width:            80,
+	}
+	
+	viewWithHelp := sbWithHelp.View()
+	viewWithoutHelp := sbWithoutHelp.View()
+	
+	assert.Contains(t, viewWithHelp, "F1: ヘルプ")
+	assert.NotContains(t, viewWithoutHelp, "F1: ヘルプ")
 }
 
 func TestStatusBar_SetWidth(t *testing.T) {
