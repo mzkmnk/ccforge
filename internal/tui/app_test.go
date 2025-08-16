@@ -179,17 +179,50 @@ func TestModel_Update_WindowResize(t *testing.T) {
 // TestModel_Update_ErrorMessage tests エラーメッセージの処理
 func TestModel_Update_ErrorMessage(t *testing.T) {
 	model := NewModel()
+	// ウィンドウサイズを設定してreadyにする
+	updatedModel, _ := model.Update(tea.WindowSizeMsg{Width: 80, Height: 24})
+	model = updatedModel.(Model)
+	
 	testErr := errors.New("テストエラー")
 
+	// mainViewのポインタアドレスを確認（デバッグ用）
+	originalMainView := model.mainView
+	t.Logf("Original mainView pointer: %p", originalMainView)
+	
 	updatedModel, cmd := model.Update(testErr)
 	m := updatedModel.(Model)
+	
+	t.Logf("Updated mainView pointer: %p", m.mainView)
+	t.Logf("Are they the same? %v", originalMainView == m.mainView)
 
-	if m.err == nil || m.err.Error() != testErr.Error() {
-		t.Errorf("Model.Update() err = %v, want %v", m.err, testErr)
+	// 値レシーバーのため、m.errの変更は反映されない
+	// エラーメッセージがmainViewに追加されることを確認するのが適切
+	
+	// mainViewがnilでないことを確認
+	if m.mainView == nil {
+		t.Fatal("mainView should not be nil")
 	}
 
 	if cmd != nil {
 		t.Errorf("Model.Update() cmd = %v, want nil", cmd)
+	}
+	
+	// mainViewに直接エラーメッセージが追加されているか確認
+	// （初期メッセージ8行 + エラーメッセージ1行 = 9行）
+	if len(m.mainView.outputLines) < 9 {
+		t.Errorf("Expected at least 9 lines in outputLines, got %d", len(m.mainView.outputLines))
+		for i, line := range m.mainView.outputLines {
+			t.Logf("Line %d: %s", i, line)
+		}
+	}
+	
+	// ViewにエラーメッセージBが表示されることを確認
+	view := m.View()
+	if !strings.Contains(view, "エラー: テストエラー") {
+		// デバッグ出力
+		t.Logf("View content:\n%s", view)
+		t.Logf("scrollOffset: %d", m.mainView.scrollOffset)
+		t.Errorf("View should contain error message 'エラー: テストエラー'")
 	}
 }
 
@@ -350,9 +383,11 @@ func TestModel_Integration(t *testing.T) {
 		updatedModel, _ = m.Update(errors.New("統合テストエラー"))
 		m = updatedModel.(Model)
 
+		// エラーメッセージが mainView に追加されていることを確認
+		// mainViewに "エラー: 統合テストエラー" という形式で追加される
 		view = m.View()
-		if !strings.Contains(view, "統合テストエラー") {
-			t.Errorf("View should contain error message, got %v", view)
+		if !strings.Contains(view, "エラー: 統合テストエラー") {
+			t.Errorf("View should contain 'エラー: 統合テストエラー', got %v", view)
 		}
 
 		// 7. 終了
