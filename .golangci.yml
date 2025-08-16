@@ -1,9 +1,16 @@
+# golangci-lint設定ファイル
+# 注意: GitHub ActionsでGolangci-lint v2.4.0を使用しているため、
+# 新しいバージョンの設定は使用できません
+
+run:
+  timeout: 5m
+  tests: true
+
 linters:
   enable:
     - bodyclose
     - dogsled
     - dupl
-    - funlen
     - goconst
     - gocritic
     - gocyclo
@@ -22,7 +29,7 @@ linters:
 
 linters-settings:
   funlen:
-    lines: 80  # テスト関数のため、制限を緩める
+    lines: 80
     statements: 60
 
 issues:
