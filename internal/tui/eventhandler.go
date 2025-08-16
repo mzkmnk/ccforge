@@ -96,8 +96,8 @@ func (e *EventHandler) Handle(model *Model, msg tea.Msg) (*Model, tea.Cmd) {
 		return handler(model, msg)
 	}
 
-	// デフォルト処理
-	return model, nil
+	// ハンドラーが見つからない場合はnilを返して、フォールバック処理に任せる
+	return nil, nil
 }
 
 // HandleKeyboardMessage はキーボードメッセージを処理する

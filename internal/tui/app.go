@@ -104,7 +104,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case error:
 		// エラーメッセージの処理
 		m.err = msg
-		m.mainView.AddOutput(fmt.Sprintf("エラー: %v", msg))
+		if m.mainView != nil {
+			m.mainView.AddOutput(fmt.Sprintf("エラー: %v", msg))
+		}
 		return m, nil
 	}
 
