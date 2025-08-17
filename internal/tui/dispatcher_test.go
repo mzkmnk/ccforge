@@ -5,6 +5,8 @@ import (
 )
 
 // TestCommandDispatcher はコマンドディスパッチャーのテスト
+
+//nolint:funlen // テスト関数は複数のテストケースを含むため長くなる
 func TestCommandDispatcher(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -108,6 +110,8 @@ func TestRegisterCommand(t *testing.T) {
 }
 
 // TestParseCommand はコマンドパースのテスト
+
+//nolint:funlen // テスト関数は複数のテストケースを含むため長くなる
 func TestParseCommand(t *testing.T) {
 	tests := []struct {
 		name        string

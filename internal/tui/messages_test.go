@@ -7,6 +7,8 @@ import (
 )
 
 // TestKeyboardMessage はキーボードメッセージのテスト
+
+//nolint:funlen // テスト関数は複数のテストケースを含むため長くなる
 func TestKeyboardMessage(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -84,6 +86,8 @@ func TestKeyboardMessage(t *testing.T) {
 }
 
 // TestProcessMessage はプロセスメッセージのテスト
+//
+//nolint:funlen // テスト関数は複数のテストケースを含むため長くなる
 func TestProcessMessage(t *testing.T) {
 	tests := []struct {
 		name        string

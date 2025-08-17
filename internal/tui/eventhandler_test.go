@@ -7,6 +7,8 @@ import (
 )
 
 // TestEventHandler はイベントハンドラーのテスト
+
+//nolint:funlen // テスト関数は複数のテストケースを含むため長くなる
 func TestEventHandler(t *testing.T) {
 	handler := NewEventHandler()
 	model := NewModel()
