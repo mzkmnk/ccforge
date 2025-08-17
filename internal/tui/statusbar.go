@@ -50,6 +50,11 @@ func (s *StatusBar) SetConnectionStatus(status ConnectionStatus) {
 	s.connectionStatus = status
 }
 
+// SetStatus はステータスを設定する
+func (s *StatusBar) SetStatus(status string) {
+	s.activeTask = status
+}
+
 // ToggleHelp はヘルプ表示を切り替える
 func (s *StatusBar) ToggleHelp() {
 	s.showHelp = !s.showHelp

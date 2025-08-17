@@ -81,10 +81,10 @@ func TestInitializeApp(t *testing.T) {
 			name: "異常系_初期化失敗",
 			setup: func() {
 				// エラーを発生させる設定
-				os.Setenv("CCFORGE_INIT_ERROR", "true")
+				_ = os.Setenv("CCFORGE_INIT_ERROR", "true")
 			},
 			cleanup: func() {
-				os.Unsetenv("CCFORGE_INIT_ERROR")
+				_ = os.Unsetenv("CCFORGE_INIT_ERROR")
 			},
 			wantErr: true,
 		},
@@ -180,10 +180,10 @@ func TestMainFlow(t *testing.T) {
 			name: "正常系_完全な起動フロー",
 			args: []string{},
 			setup: func() {
-				os.Setenv("CCFORGE_TEST_MODE", "true")
+				_ = os.Setenv("CCFORGE_TEST_MODE", "true")
 			},
 			cleanup: func() {
-				os.Unsetenv("CCFORGE_TEST_MODE")
+				_ = os.Unsetenv("CCFORGE_TEST_MODE")
 			},
 			wantErr: false,
 		},
@@ -191,10 +191,10 @@ func TestMainFlow(t *testing.T) {
 			name: "正常系_ヘルプ表示",
 			args: []string{"-h"},
 			setup: func() {
-				os.Setenv("CCFORGE_TEST_MODE", "true")
+				_ = os.Setenv("CCFORGE_TEST_MODE", "true")
 			},
 			cleanup: func() {
-				os.Unsetenv("CCFORGE_TEST_MODE")
+				_ = os.Unsetenv("CCFORGE_TEST_MODE")
 			},
 			wantErr: false,
 		},
